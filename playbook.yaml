@@ -1,23 +1,22 @@
 ---
-- name: schelottoPlaybook
-  hosts: cliente
-  connection: local
+- name: scriptPlaybook
+  hosts: virtualmachines
+  vars:
+    nombre_container: linux2022utn
+    repositorio: jorgeschelotto85/linux2022utn
+    version_img: 1.0.0
   tasks:
-    - name: Ping my host
-      ansible.builtin.ping:
-    - name: Print message
-      ansible.builtin.debug:
-    - name: Build Image
-      docker_image:
-        name: "scriptSchelotto:1.0.0"
-        build:
-          pull: yes
-          path: "/root/tpfinal/app/"
-        state: present
-        source: build
-    - name: Deploy docker container
-      docker_container:
-        name: "programContainer"
-        image: scriptSchelotto
-        state: started
-      register: docker_info
+    - name: image pull
+      command: docker run --name {{nombre_container}} {{repositorio}}:{{version_img}}
+      register: docker_output
+    - name: Chequear containers
+      command: docker ps -a
+      register: container_ps_output
+    - name: Imprimir resultado de contenedor
+      debug:
+        var: docker_output.stdout_lines
+    - name: Contenedores creados
+      debug:
+        var: container_ps_output.stdout_lines
+    - name: Remover contenedor {{nombre_container}}
+      command: docker container rm {{nombre_container}}
