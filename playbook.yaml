@@ -1,0 +1,23 @@
+---
+- name: schelottoPlaybook
+  hosts: cliente
+  connection: local
+  tasks:
+    - name: Ping my host
+      ansible.builtin.ping:
+    - name: Print message
+      ansible.builtin.debug:
+    - name: Build Image
+      docker_image:
+        name: "scriptSchelotto:1.0.0"
+        build:
+          pull: yes
+          path: "/root/tpfinal/app/"
+        state: present
+        source: build
+    - name: Deploy docker container
+      docker_container:
+        name: "programContainer"
+        image: scriptSchelotto
+        state: started
+      register: docker_info
